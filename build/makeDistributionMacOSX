@@ -1,0 +1,80 @@
+#!/bin/sh
+
+#
+# Modification History
+#
+# 2007-November-12   Jason Rohrer
+# Copied from Cultivation build.
+#
+
+
+if [ $# -lt 3 ] ; then
+   echo "Usage: $0 release_name unix_platform_name path_to_SDL.framework"
+   exit 1
+fi
+
+
+rm -rf mac/OneLife_$1
+
+
+./makeBaseDistributionFolder $1
+
+mkdir mac
+mv base/* mac
+
+
+cd ../gameSource
+sh makeRegenerateCaches
+
+cd ../build/mac/OneLife_$1
+
+
+# mac version now defaults to windowed mode
+# too many problems and crashes will fullscreen
+echo "0" > settings/fullscreen.ini
+
+
+../../../gameSource/regenerateCaches
+
+# don't ever include bin_cache in bundles, because they are large
+# and change every update
+rm */bin_*cache.fcz
+
+cd ../..
+
+
+onelife_app=mac/OneLife_$1/OneLife_$1.app/Contents/MacOS/OneLife
+cp -r macOSX/OneLife.app mac/OneLife_$1/OneLife_$1.app
+cp ../../OneLifeApp $onelife_app
+
+rm -r mac/OneLife_$1/OneLife_$1.app/Contents/MacOS/empty.txt
+
+# install SDL framework
+t=$'\t'
+framework_folder=mac/OneLife_$1/OneLife_$1.app/Contents/Frameworks
+cp /usr/local/opt/freetype/lib/libfreetype.dylib $framework_folder
+cp /usr/local/opt/libpng/lib/libpng.dylib $framework_folder
+cp /usr/local/opt/sdl12-compat/lib/libSDL.dylib $framework_folder
+
+install_name_tool -change `otool -L $onelife_app | grep -o -e "[^ $t]*freetype[^ $t]*"` @executable_path/../Frameworks/libfreetype.dylib $onelife_app
+install_name_tool -change `otool -L $framework_folder/libfreetype.dylib | grep -o -e "[^ $t]*png[^ $t]*"` @executable_path/../Frameworks/libpng.dylib $framework_folder/libfreetype.dylib
+install_name_tool -id @executable_path/libpng.dylib $framework_folder/libpng.dylib
+install_name_tool -change `otool -L $onelife_app | grep -o -e "[^ $t]*SDL[^ $t]*"` @executable_path/../Frameworks/libSDL.dylib $onelife_app
+
+cp ../scripts/skps2010Scripts/translator.py mac/OneLife_$1
+cp ../scripts/skps2010Scripts/translator mac/OneLife_$1
+
+cd mac
+
+
+d=`date`
+
+echo "$1 built on $d" > OneLife_$1/binary.txt
+
+zip -r -q OneLife_MacOSX_$1.zip OneLife_$1
+
+
+
+
+
+
