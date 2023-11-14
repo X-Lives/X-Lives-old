@@ -7,7 +7,7 @@ int binVersionNumber = versionNumber;
 // Please use this tag to describe your client honestly and uniquely
 // client_official is reserved for the unmodded client
 // do not include whitespace in your tag
-const char *clientTag = "client_xLives";
+const char *clientTag = "client_XLives";
 
 
 
@@ -268,17 +268,17 @@ char isNonIntegerScalingAllowed() {
 
 
 const char *getWindowTitle() {
-    return "OneLife";
+    return "X-Lives";
     }
 
 
 const char *getAppName() {
-    return "OneLife";
+    return "XLives";
     }
 
 const char *getLinuxAppName() {
     // no dir-name conflict here because we're using all caps for app name
-    return "OneLifeApp";
+    return "XLivesApp";
     }
 
 
@@ -472,7 +472,7 @@ void initFrameDrawer( int inWidth, int inHeight, int inTargetFrameRate,
 
 
     AppLog::printOutNextMessage();
-    AppLog::infoF( "OneLife client v%d (binV=%d, dataV=%d) starting up",
+    AppLog::infoF( "XLives client v%d (binV=%d, dataV=%d) starting up",
                    versionNumber, binVersionNumber, dataVersionNumber );
             
 
