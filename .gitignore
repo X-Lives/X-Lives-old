@@ -34,6 +34,7 @@ gameSource/photoCache/*
 gameSource/playbackGame/*
 gameSource/reverbCache/*
 gameSource/dataVersionNumber.txt
+gameSource/log.txt
 
 server/XServer
 server/log.txt
