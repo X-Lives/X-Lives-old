@@ -27,12 +27,12 @@ gameSource/sounds
 gameSource/sprites
 gameSource/transitions
 gameSource/overlays
-gameSource/settings/
-gameSource/scenes/
-gameSource/groundTileCache/
-gameSource/photoCache/
-gameSource/playbackGame/
-gameSource/reverbCache/
+gameSource/settings/*
+gameSource/scenes/*
+gameSource/groundTileCache/*
+gameSource/photoCache/*
+gameSource/playbackGame/*
+gameSource/reverbCache/*
 gameSource/dataVersionNumber.txt
 
 server/XServer
@@ -45,12 +45,12 @@ server/clientTagLog.txt
 server/recentPlacements.txt
 server/biomeRandSeed.txt
 server/dataVersionNumber.txt
-server/backups/
-server/curseLog
-server/failureLog/
-server/foodLog/
-server/lifeLog/
-server/mapChangeLogs/
+server/backups/*
+server/curseLog/*
+server/failureLog/*
+server/foodLog/*
+server/lifeLog/*
+server/mapChangeLogs/*
 server/settings
 server/categories
 server/objects
