@@ -28,21 +28,31 @@ gameSource/sprites
 gameSource/transitions
 gameSource/overlays
 gameSource/settings/*
-gameSource/scenes/*
+gameSource/scenes
 gameSource/groundTileCache/*
 gameSource/photoCache/*
 gameSource/playbackGame/*
 gameSource/reverbCache/*
+gameSource/overlayImport/*
+gameSource/spriteImportCache/*
 gameSource/dataVersionNumber.txt
+gameSource/testMap.txt
+gameSource/testMap.txt
+gameSource/untrimmed.aiff
+gameSource/inputSoundTemp.wav
 gameSource/log.txt
+gameSource/log.txt.backup
 
 server/XServer
-server/log.txt
-server/recentPlacements.txt
+server/lastEveLocation.txt
+server/testMap.txt
+server/testMapStale.txt
+server/tutorialMaps
 server/*.db
 server/log.txt
 server/familyDataLog.txt
 server/clientTagLog.txt
+server/evePlacementHomelandLog.txt
 server/recentPlacements.txt
 server/biomeRandSeed.txt
 server/dataVersionNumber.txt
@@ -56,6 +66,6 @@ server/settings
 server/categories
 server/objects
 server/transitions
-server/tutorialMap
+server/tutorialMaps
 
 build/mac/*
