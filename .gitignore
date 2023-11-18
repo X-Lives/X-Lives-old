@@ -5,28 +5,56 @@
 *.dep2
 *~
 *.orig
-# Makefile*
+Makefile*
 
 callgrind.out*
 leak.out*
 core*
 
-gameSource/OneLife
+gameSource/XLives
+gameSource/XEditor
+gameSource/XEditor-zh_cn
 gameSource/testUser/*
 gameSource/testUser2/*
 gameSource/recordedGames/*
 gameSource/screenShots/*
+gameSource/animations
+gameSource/categories
+gameSource/ground
+gameSource/music
+gameSource/objects
+gameSource/sounds
+gameSource/sprites
+gameSource/transitions
+gameSource/overlays
+gameSource/settings/
+gameSource/scenes/
+gameSource/groundTileCache/
+gameSource/photoCache/
+gameSource/playbackGame/
+gameSource/reverbCache/
+gameSource/dataVersionNumber.txt
 
-server/OneLifeServer
+server/XServer
 server/log.txt
 server/recentPlacements.txt
 server/*.db
+server/log.txt
+server/familyDataLog.txt
+server/clientTagLog.txt
+server/recentPlacements.txt
+server/biomeRandSeed.txt
+server/dataVersionNumber.txt
 server/backups/
+server/curseLog
 server/failureLog/
 server/foodLog/
 server/lifeLog/
+server/mapChangeLogs/
+server/settings
 server/categories
 server/objects
 server/transitions
+server/tutorialMap
 
 build/mac/*
