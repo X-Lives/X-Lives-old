@@ -1,9 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
-if [ $# -lt 1 ] ; then
-   echo "Usage: $0 release_name"
-   exit 1
-fi
+source "variables-build.sh"
+
+# if [ $# -lt 1 ] ; then
+#    echo "Usage: $0 release_name"
+#    exit 1
+# fi
 
 
 rm -rf base
@@ -11,7 +13,7 @@ rm -rf base
 mkdir base
 
 
-baseFolder=base/OneLife_$1
+baseFolder=base/${client_name}_${Client_v}
 
 mkdir $baseFolder
 mkdir $baseFolder/graphics
@@ -40,25 +42,25 @@ cp ../gameSource/languages/*.txt $baseFolder/languages
 cp ../gameSource/language.txt $baseFolder
 cp ../gameSource/us_english_60.txt $baseFolder
 cp ../documentation/Readme.txt $baseFolder
-cp ../no_copyright.txt $baseFolder
+cp ../LICENSE $baseFolder
 
 cp ../gameSource/reverbImpulseResponse.aiff $baseFolder/
 
 cp ../gameSource/wordList.txt $baseFolder/
 
 
-cp ../../OneLifeData7/sprites/* $baseFolder/sprites
-cp ../../OneLifeData7/objects/* $baseFolder/objects
-cp ../../OneLifeData7/categories/* $baseFolder/categories
-cp ../../OneLifeData7/transitions/* $baseFolder/transitions
-cp ../../OneLifeData7/animations/* $baseFolder/animations
-cp ../../OneLifeData7/music/* $baseFolder/music
-cp ../../OneLifeData7/sounds/* $baseFolder/sounds
-cp ../../OneLifeData7/ground/* $baseFolder/ground
+cp ../../${directory_data}/sprites/* $baseFolder/sprites
+cp ../../${directory_data}/objects/* $baseFolder/objects
+cp ../../${directory_data}/categories/* $baseFolder/categories
+cp ../../${directory_data}/transitions/* $baseFolder/transitions
+cp ../../${directory_data}/animations/* $baseFolder/animations
+cp ../../${directory_data}/music/* $baseFolder/music
+cp ../../${directory_data}/sounds/* $baseFolder/sounds
+cp ../../${directory_data}/ground/* $baseFolder/ground
 
 
 
-cp ../../OneLifeData7/dataVersionNumber.txt $baseFolder/
+cp ../../${directory_data}/dataVersionNumber.txt $baseFolder/
 
 
 rm -f $baseFolder/settings/email.ini
