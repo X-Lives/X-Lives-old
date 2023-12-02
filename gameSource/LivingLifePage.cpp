@@ -1247,7 +1247,7 @@ static char *getDisplayObjectDescription( int inID ) {
 char *LivingLifePage::minitechGetDisplayObjectDescription( int objId ) { 
     ObjectRecord *o = getObject( objId );
     if( o == NULL ) {
-		return "";
+		return NULL;
     }
 	return getDisplayObjectDescription(objId);
 }
@@ -17511,7 +17511,7 @@ void LivingLifePage::step() {
                                 mNextHintIndex = 
                                     mHintBookmarks[ mNextHintObjectID ];
 
-							minitech::currentHintObjId = mNextHintObjectID;
+							if (minitech::changeHintObjOnTouch) minitech::currentHintObjId = mNextHintObjectID;
                                 }
                             }
                         
@@ -24463,7 +24463,7 @@ void LivingLifePage::pointerDown( float inX, float inY ) {
                 mNextHintObjectID = destID;
                 if( isHintFilterStringInvalid() ) {
                     mNextHintIndex = mHintBookmarks[ destID ];
-                    minitech::currentHintObjId = destID;
+                    if (minitech::changeHintObjOnTouch) minitech::currentHintObjId = destID;
                     }
                 }
             else if( tr->newActor > 0 && 
@@ -24472,7 +24472,7 @@ void LivingLifePage::pointerDown( float inX, float inY ) {
                 mNextHintObjectID = tr->newActor;
                 if( isHintFilterStringInvalid() ) {
                     mNextHintIndex = mHintBookmarks[ tr->newTarget ];
-                    minitech::currentHintObjId = tr->newActor;
+                    if (minitech::changeHintObjOnTouch) minitech::currentHintObjId = tr->newActor;
                     }
                 }
             else if( tr->newTarget > 0 ) {
@@ -24480,7 +24480,7 @@ void LivingLifePage::pointerDown( float inX, float inY ) {
                 mNextHintObjectID = tr->newTarget;
                 if( isHintFilterStringInvalid() ) {
                     mNextHintIndex = mHintBookmarks[ tr->newTarget ];
-                    minitech::currentHintObjId = tr->newTarget;
+                    if (minitech::changeHintObjOnTouch) minitech::currentHintObjId = tr->newTarget;
                     }
                 }
             }
@@ -24492,7 +24492,7 @@ void LivingLifePage::pointerDown( float inX, float inY ) {
                 mNextHintObjectID = destID;
                 if( isHintFilterStringInvalid() ) {
                     mNextHintIndex = mHintBookmarks[ destID ];
-                    minitech::currentHintObjId = destID;
+                    if (minitech::changeHintObjOnTouch) minitech::currentHintObjId = destID;
                     }
                 }
             }
@@ -26393,12 +26393,17 @@ void LivingLifePage::keyDown( unsigned char inASCII ) {
                                 
                                 int filterStringLen = 
                                     strlen( trimmedFilterString );
-                            
+                                                        
                                 if( filterStringLen > 0 ) {
                                     // not blank
                                     mHintFilterString = 
                                         stringDuplicate( trimmedFilterString );
+                                        
+                                    minitech::inputHintStrToSearch( mHintFilterString );
                                     }
+                                else {
+									minitech::inputHintStrToSearch( "" );;
+								}
                             
                                 delete [] trimmedFilterString;
                             

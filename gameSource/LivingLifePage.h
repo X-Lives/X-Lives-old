@@ -560,6 +560,7 @@ class LivingLifePage : public GamePage, public ActionListener {
 
 		doublePair minitechGetLastScreenViewCenter();
 		char *minitechGetDisplayObjectDescription(int objId);
+        bool minitechSayFieldIsFocused() { return mSayField.isFocused(); }
 
         virtual void actionPerformed( GUIComponent *inTarget );
         
