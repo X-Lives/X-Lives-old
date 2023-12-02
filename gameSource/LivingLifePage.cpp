@@ -57,6 +57,7 @@
 
 static ObjectPickable objectPickable;
 
+#include "minitech.h"
 
 
 #define MAP_D 64
@@ -87,6 +88,7 @@ static float pencilErasedFontExtraFade = 0.75;
 
 
 extern doublePair lastScreenViewCenter;
+doublePair LivingLifePage::minitechGetLastScreenViewCenter() { return lastScreenViewCenter; }
 
 static char shouldMoveCamera = true;
 
@@ -1242,6 +1244,13 @@ static char *getDisplayObjectDescription( int inID ) {
     return upper;
     }
 
+char *LivingLifePage::minitechGetDisplayObjectDescription( int objId ) { 
+    ObjectRecord *o = getObject( objId );
+    if( o == NULL ) {
+		return "";
+    }
+	return getDisplayObjectDescription(objId);
+}
 
 
 typedef enum messageType {
@@ -3076,6 +3085,13 @@ LivingLifePage::LivingLifePage()
         }
     }
 
+	minitech::setLivingLifePage(
+		this, 
+		&gameObjects, 
+		mMapD, 
+		pathFindingD, 
+		mMapContainedStacks, 
+		mMapSubContainedStacks);
 
 
 
@@ -9653,7 +9669,7 @@ void LivingLifePage::draw( doublePair inViewCenter,
     for( int i=0; i<NUM_HINT_SHEETS; i++ ) {
         if( ! equal( mHintPosOffset[i], mHintHideOffset[i] ) 
             &&
-            mHintMessage[i] != NULL ) {
+            mHintMessage[i] != NULL && !minitech::minitechEnabled ) {
             
             doublePair hintPos  = 
                 add( mHintPosOffset[i], lastScreenViewCenter );
@@ -11095,6 +11111,14 @@ void LivingLifePage::draw( doublePair inViewCenter,
             }
         }
 
+	// minitech
+	float worldMouseX, worldMouseY;
+	getLastMouseScreenPos( &lastScreenMouseX, &lastScreenMouseY );
+	screenToWorld( lastScreenMouseX,
+				   lastScreenMouseY,
+				   &worldMouseX,
+				   &worldMouseY );
+	minitech::livingLifeDraw(worldMouseX, worldMouseY);
     
     if( vogMode ) {
         // draw again, so we can see picker
@@ -14195,6 +14219,7 @@ void LivingLifePage::step() {
         }
     
 
+        minitech::livingLifeStep();
     if( showFPS ) {
         timeMeasures[1] += game_getCurrentTime() - updateStartTime;
         }
@@ -15695,7 +15720,9 @@ void LivingLifePage::step() {
                 
                 if( !( mFirstServerMessagesReceived & 1 ) ) {
                     // first map chunk just recieved
-                    
+
+					minitech::initOnBirth();
+
                     char found = false;
                     int closestX = 0;
                     int closestY = 0;
@@ -17483,6 +17510,8 @@ void LivingLifePage::step() {
                             if( isHintFilterStringInvalid() ) {
                                 mNextHintIndex = 
                                     mHintBookmarks[ mNextHintObjectID ];
+
+							minitech::currentHintObjId = mNextHintObjectID;
                                 }
                             }
                         
@@ -19033,6 +19062,7 @@ void LivingLifePage::step() {
                 ourID = ourObject->id;
 
                 if( ourID != lastPlayerID ) {
+                                        minitech::initOnBirth();
                     // different ID than last time, delete old home markers
                     oldHomePosStack.deleteAll();
                     }
@@ -23927,6 +23957,8 @@ static void freeSavedPath() {
 
 
 void LivingLifePage::pointerDown( float inX, float inY ) {
+        if (minitech::livingLifePageMouseDown( inX, inY )) return;
+    
     lastMouseX = inX;
     lastMouseY = inY;
 
@@ -24431,6 +24463,7 @@ void LivingLifePage::pointerDown( float inX, float inY ) {
                 mNextHintObjectID = destID;
                 if( isHintFilterStringInvalid() ) {
                     mNextHintIndex = mHintBookmarks[ destID ];
+                    minitech::currentHintObjId = destID;
                     }
                 }
             else if( tr->newActor > 0 && 
@@ -24439,6 +24472,7 @@ void LivingLifePage::pointerDown( float inX, float inY ) {
                 mNextHintObjectID = tr->newActor;
                 if( isHintFilterStringInvalid() ) {
                     mNextHintIndex = mHintBookmarks[ tr->newTarget ];
+                    minitech::currentHintObjId = tr->newActor;
                     }
                 }
             else if( tr->newTarget > 0 ) {
@@ -24446,6 +24480,7 @@ void LivingLifePage::pointerDown( float inX, float inY ) {
                 mNextHintObjectID = tr->newTarget;
                 if( isHintFilterStringInvalid() ) {
                     mNextHintIndex = mHintBookmarks[ tr->newTarget ];
+                    minitech::currentHintObjId = tr->newTarget;
                     }
                 }
             }
@@ -24457,6 +24492,7 @@ void LivingLifePage::pointerDown( float inX, float inY ) {
                 mNextHintObjectID = destID;
                 if( isHintFilterStringInvalid() ) {
                     mNextHintIndex = mHintBookmarks[ destID ];
+                    minitech::currentHintObjId = destID;
                     }
                 }
             }
@@ -25833,6 +25869,7 @@ void LivingLifePage::keyDown( unsigned char inASCII ) {
         return;
         }
 
+    if (minitech::livingLifeKeyDown(inASCII)) return;
     
     switch( inASCII ) {
         /*
