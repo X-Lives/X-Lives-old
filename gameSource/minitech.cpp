@@ -783,8 +783,8 @@ void minitech::updateDrawTwoTech() {
 			
 			TransRecord* trans = transToShow[i];
 			
-			printf("DEBUG: %d + %d = %d + %d\n", trans->actor, trans->target, trans->newActor, trans->newTarget);
-			printf("DEBUG: %d\n", trans->autoDecaySeconds);
+			// printf("DEBUG: %d + %d = %d + %d\n", trans->actor, trans->target, trans->newActor, trans->newTarget);
+			// printf("DEBUG: %d\n", trans->autoDecaySeconds);
 			
 
 			doublePair posLineTL = {
@@ -1054,7 +1054,7 @@ void minitech::updateDrawTwoTech() {
 
 
 void minitech::livingLifeDraw(float mX, float mY) {
-	
+
 	if (!minitechEnabled) return;
 	
 	doublePair screenPos = livingLifePage->minitechGetLastScreenViewCenter();
