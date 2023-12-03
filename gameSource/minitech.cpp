@@ -44,7 +44,7 @@ SimpleVector<int> *minitech::mMapContainedStacks;
 SimpleVector<SimpleVector<int>> *minitech::mMapSubContainedStacks;
 
 bool minitech::minitechMinimized = true;
-unsigned char minitech::minimizeKey = 'o';
+unsigned char minitech::minimizeKey;
 int minitech::stepCount;
 float minitech::currentX;
 float minitech::currentY;
@@ -90,6 +90,8 @@ void minitech::setLivingLifePage(
 	mMapSubContainedStacks = inmMapSubContainedStacks;
 	
 	minitechEnabled = SettingsManager::getIntSetting( "useMinitech", 1 );
+	char *minimizeKeyFromSetting = SettingsManager::getStringSetting("minitechMinimizeKey", "v");
+	minimizeKey = minimizeKeyFromSetting[0];
 }
 
 void minitech::initOnBirth() { 
@@ -192,6 +194,8 @@ minitech::mouseListener* minitech::getMouseListenerByArea(
 }
 
 GridPos minitech::getClosestTile(GridPos src, int objId) {
+	
+	objId = getDummyParent(objId);
 	
 	int *mMap = livingLifePage->mMap;
 		
@@ -323,6 +327,8 @@ int minitech::compareObjUse(int idA, int idB) {
 	//return 1 if a and b have the same parent and a's use < b's
 	//return 0 otherwise
 	
+	if (idA <= 0 || idB <= 0) return 0;
+	
 	ObjectRecord* a = getObject(idA);
 	ObjectRecord* b = getObject(idB);
 	
@@ -431,6 +437,7 @@ vector<bool> minitech::getObjIsCloseVector() {
 				
 				if ( ! (!id || id <= 0 || id >= maxObjects) ) {
 					objIsClose[id] = true;
+					objIsClose[getDummyParent(id)] = true;
 					foundInThisTile = true;
 				}
 				
@@ -438,6 +445,7 @@ vector<bool> minitech::getObjIsCloseVector() {
 					for (int i=0; i < mMapContainedStacks[mapI].size(); i++) {
 						id = mMapContainedStacks[mapI].getElementDirect(i);
 						objIsClose[id] = true;
+						objIsClose[getDummyParent(id)] = true;
 						foundInThisTile = true;
 					}
 					if (foundInThisTile) continue;
@@ -449,6 +457,7 @@ vector<bool> minitech::getObjIsCloseVector() {
 						for (int k=0; k < subContainedStack.size(); k++) {
 							id = subContainedStack.getElementDirect(k);
 							objIsClose[id] = true;
+							objIsClose[getDummyParent(id)] = true;
 							foundInThisTile = true;
 						}
 					}
@@ -642,6 +651,7 @@ vector<TransRecord*> minitech::getUsesTrans(int objId) {
 		int idC = trans->newActor;
 		int idD = trans->newTarget;
 		
+		//parse probabilitySet transitions (e.g. fishing)
 		int cOrD = -1;
 		if ( isProbabilitySet(idC) ) cOrD = 0;
 		if ( isProbabilitySet(idD) ) cOrD = 1;
@@ -661,10 +671,15 @@ vector<TransRecord*> minitech::getUsesTrans(int objId) {
 			continue;
 		}
 		
-		if ( isUseDummyAndNotLastUse(idA) && isUseDummyAndNotLastUse(idC) ) continue;
-		if ( isUseDummyAndNotLastUse(idB) && isUseDummyAndNotLastUse(idD) ) continue;
+		//Skip useDummy when not holding them (e.g. holding bowl, skip bucket of water useDummies, only keep first and last use)
+		if ( isUseDummyAndNotLastUse(idA) && isUseDummyAndNotLastUse(idC) && idA != objId ) continue;
+		if ( isUseDummyAndNotLastUse(idB) && isUseDummyAndNotLastUse(idD) && idB != objId ) continue;
+		//Skip categories
 		if ( isCategory(idA) || isCategory(idB) || isCategory(idC) || isCategory(idD) ) continue;
+		//Skip raw lastUse transitions, the proper ones are auto-generated and not tagged as lastUse
 		if ( trans->lastUseActor || trans->lastUseTarget ) continue;
+		//Skip generic use transitions when they are not food
+		if (idB == -1 && idD == 0 && getObject(idA) != NULL && getObject(idA)->foodValue == 0) continue; 
 		
 		results.push_back(trans);
 
@@ -692,11 +707,20 @@ vector<TransRecord*> minitech::getProdTrans(int objId) {
 		int idC = trans->newActor;
 		int idD = trans->newTarget;
 		
+		//Skip the use of the object which returns the object itself (e.g. sharp stone on branches)
 		if ( idA == objId || idB == objId ) continue;
-		if ( isUseDummyAndNotLastUse(idA) && isUseDummyAndNotLastUse(idC) ) continue;
-		if ( isUseDummyAndNotLastUse(idB) && isUseDummyAndNotLastUse(idD) ) continue;
+		//Skip useDummy when not holding them (e.g. holding bowl, skip bucket of water useDummies, only keep first and last use)
+		if ( isUseDummyAndNotLastUse(idA) && isUseDummyAndNotLastUse(idC) && idC != objId ) continue;
+		if ( isUseDummyAndNotLastUse(idB) && isUseDummyAndNotLastUse(idD) && idD != objId ) continue;
+		//Skip categories
 		if ( isCategory(idA) || isCategory(idB) || isCategory(idC) || isCategory(idD) ) continue;
+		//Skip raw lastUse transitions, the proper ones are auto-generated and not tagged as lastUse
 		if ( trans->lastUseActor || trans->lastUseTarget ) continue;
+		//Skip generic use transitions when they are not food
+		if (idB == -1 && idD == 0 && getObject(idA) != NULL && getObject(idA)->foodValue == 0) continue;
+		
+		//Strangely there are results that do not make the object at all e.g. bowl of water, reason unknown yet
+		if (idC != objId && idD != objId) continue;
 		
 		results.push_back(trans);
 
@@ -1094,7 +1118,11 @@ void minitech::updateDrawTwoTech() {
 				drawRect(pos, iconSize/2, iconSize/2);
 			}
 			if (trans->target == -1) {
-				drawObj(pos, trans->target, "EMPTY", "GROUND");
+				if (trans->newTarget == 0) {
+					drawStr("MOUTH", pos, "tinyHandwritten", false);
+				} else {
+					drawObj(pos, trans->target, "EMPTY", "GROUND");
+				}
 			} else {
 				drawObj(pos, trans->target);
 			}
@@ -1161,6 +1189,8 @@ void minitech::updateDrawTwoTech() {
 			pos.x += iconSize;
 			if (trans->actor == -1 && trans->autoDecaySeconds != 0 && trans->newActor == 0) {
 				//not drawing the plus sign for pure Changes over time...
+			} else if (trans->target == -1 && trans->newTarget == 0) {
+				//not drawing the plus sign for eating transitions
 			} else {
 				drawStr("+", pos, "handwritten", false);
 			}
@@ -1178,6 +1208,9 @@ void minitech::updateDrawTwoTech() {
 			}
 			if (trans->actor == -1 && trans->autoDecaySeconds != 0 && trans->newTarget == 0) {
 				//Despawn transitions, "DESPAWNS" is written in the newActor slot, keep this slot empty
+			} else if (trans->target == -1 && trans->newTarget == 0) {
+				//Eating transitions
+				//Other generic use transitions in which target has no food value should be filtered out in getUsesTrans and getProdTrans
 			} else {
 				drawObj(pos, trans->newTarget, "EMPTY", "GROUND");
 			}
@@ -1284,7 +1317,9 @@ void minitech::updateDrawTwoTech() {
 	float barWidth = recWidth;
 	float barHeight = 0;
 	float barOffsetY = 0;
-	if (lastHintStr != "") {
+	bool showBar = lastHintStr != "" || (ourLiveObject->holdingID != 0 && ourLiveObject->holdingID == currentHintObjId);
+	
+	if (true) {
 		barHeight = tinyLineHeight;
 		barOffsetY = - barHeight/2;
 	}
@@ -1354,8 +1389,15 @@ void minitech::updateDrawTwoTech() {
 		}
 	}
 	
-	if (lastHintStr != "") {
-		string searchStr = "SEARCHING: " + lastHintStr;
+	if (showBar) {
+		string searchStr;
+		if (lastHintStr != "") {
+			searchStr = "SEARCHING: " + lastHintStr;
+		} else if (ourLiveObject->holdingID != 0 && ourLiveObject->holdingID == currentHintObjId) {
+			string objName(livingLifePage->minitechGetDisplayObjectDescription(currentHintObjId));
+			searchStr = "HOLDING: " + objName;
+		}
+		
 		doublePair barCen = {headerLT.x + barWidth / 2, headerLT.y - barHeight / 2 - paddingY/2};
 		drawStr(searchStr, barCen, "tinyHandwritten", false);
 	}
@@ -1453,6 +1495,8 @@ void minitech::livingLifeDraw(float mX, float mY) {
 			nextListener = NULL;
 		}
 	}
+	
+	// currentHintObjId = getDummyParent(currentHintObjId);
 	
 	if ( lastHintObjId == 0 && currentHintObjId != 0 ) minitechMinimized = false;
 	
