@@ -37,7 +37,7 @@ gameSource/overlayImport/*
 gameSource/spriteImportCache/*
 gameSource/dataVersionNumber.txt
 gameSource/testMap.txt
-gameSource/testMap.txt
+gameSource/testMapScene.txt
 gameSource/untrimmed.aiff
 gameSource/inputSoundTemp.wav
 gameSource/log.txt
@@ -60,6 +60,7 @@ server/backups/*
 server/curseLog/*
 server/failureLog/*
 server/foodLog/*
+server/foodLogDetail/*
 server/lifeLog/*
 server/mapChangeLogs/*
 server/settings
