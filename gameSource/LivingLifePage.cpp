@@ -3083,8 +3083,7 @@ LivingLifePage::LivingLifePage()
     if( ! tutorialDone ) {
         mTutorialNumber = 1;
         }
-    }
-
+		
 	minitech::setLivingLifePage(
 		this, 
 		&gameObjects, 
@@ -3092,6 +3091,8 @@ LivingLifePage::LivingLifePage()
 		pathFindingD, 
 		mMapContainedStacks, 
 		mMapSubContainedStacks);
+    }
+
 
 
 

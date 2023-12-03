@@ -50,7 +50,7 @@ class SettingsPage : public GamePage, public ActionListener {
         CheckboxButton mFullscreenBox;
         CheckboxButton mBorderlessBox;
 
-                CheckboxButton mEnableNudeBox;
+                // CheckboxButton mEnableNudeBox;
 
         TextField mTargetFrameRateField;
 
