@@ -1,29 +1,25 @@
-#!/bin/bash
+#!/bin/sh
 
 #
 # Modification History
-#
-# 2023-November-22   is52hertz
-# Change to make X-Lives.
 #
 # 2007-November-12   Jason Rohrer
 # Copied from Cultivation build.
 #
 
-source "variables-build.sh"
 
-# if [ $# -lt 1 ] ; then
-#    echo "Usage: $0 release_name"
-#    exit 1
-# fi
+if [ $# -lt 1 ] ; then
+   echo "Usage: $0 release_name"
+   exit 1
+fi
 
 
 mkdir windows
 
-rm -rf windows/${client_name}_${Client_v}
+rm -rf windows/OneLife_$1
 
 
-./makeBaseDistributionFolder
+./makeBaseDistributionFolder $1
 
 mv base/* windows
 
@@ -35,7 +31,7 @@ else
     sh makeRegenerateCachesWindows
 fi
 
-cd ../build/windows/${client_name}_${Client_v}
+cd ../build/windows/OneLife_$1
 
 ../../../gameSource/regenerateCaches
 
@@ -47,9 +43,9 @@ rm */bin_*cache.fcz
 cd ../..
 
 
-cp ../gameSource/${client_name}.exe windows/${client_name}_${Client_v}/
+cp ../gameSource/OneLife.exe windows/OneLife_$1/
 
-cp win32/*.dll windows/${client_name}_${Client_v}/
+cp win32/*.dll windows/OneLife_$1/
 
 
 g++ -o unix2dos unix2dos.c 
@@ -61,9 +57,9 @@ cd windows
 
 d=`date`
 
-echo "$1 built on $d" > ${client_name}_${Client_v}/binary.txt
+echo "$1 built on $d" > OneLife_$1/binary.txt
 
-for file in $( find ./${client_name}_${Client_v} -name "*.txt" )
+for file in $( find ./OneLife_$1 -name "*.txt" )
 do
 	../unix2dosScript "$file"
 done
@@ -76,7 +72,7 @@ done
 
 # build a batch file for making a windows SFX bundle
 
-echo "set version=${Client_v}" > makeWindowsExtractor_${Client_v}.bat; cat ../makeWindowsExtractor_template >> makeWindowsExtractor_${Client_v}.bat
+echo "set version=$1" > makeWindowsExtractor_$1.bat; cat ../makeWindowsExtractor_template >> makeWindowsExtractor_$1.bat
 
 
 
